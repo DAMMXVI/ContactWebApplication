@@ -1,0 +1,135 @@
+﻿@model IEnumerable<ContactWebApplication.Models.Contact>
+@using PagedList
+@using PagedList.Mvc
+@using ContactWebApplication.Resources
+
+<head>
+    <title>@Resource.ContactListHeader</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+
+<div class="page-header text-center"><h1>@Resource.ContactListHeader</h1></div>
+
+<b>@Resource.Search : </b>
+<select id="SearchBy">
+    <option value="Name">@Resource.fullName</option>
+    <option value="PhoneNumber">@Resource.phoneNumber</option>
+    <option value="Adress">@Resource.address</option>
+</select><br /><br />
+@Html.TextBox("Search")<input type="submit" id="SearchBtn" value=@Resource.Searchh /><br /><br />
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.fullName)</th>
+            <th>@Html.DisplayNameFor(model => model.phoneNumber)</th>
+            <th>@Html.DisplayNameFor(model => model.address)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody id="dataTable">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.fullName)</td>
+                <td>@Html.DisplayFor(modelItem => item.phoneNumber)</td>
+                <td>@Html.DisplayFor(modelItem => item.address)</td>
+                <td>
+                    @Html.ActionLink(Resource.Edit, "EditContact", new { id = item.id }, new { @class = "btn btn-warning" })
+                    <a href="#" class="view btn btn-primary" data-target="/Contact/DetailsContact/@item.id">@Resource.Details</a>
+                    @Html.ActionLink(Resource.Delete, "DelContact", new { id = item.id }, new { @class = "btn btn-danger", onclick = "return confirm('" + @Resource.QuestionDelete + "');" })
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@Html.PagedListPager((IPagedList)Model, page => Url.Action("ListContact", new { page }))
+
+
+<script>
+    $(document).ready(function () {
+        $("#SearchBtn").click(function () {
+            var SearchBy = $("#SearchBy").val();
+            var SearchValue = $("#Search").val();
+            var SetData = $("#dataTable");
+            SetData.html("");
+            $.ajax({
+                type: "post",
+                url: "/Contact/GetSearchingData?SearchBy=" + SearchBy + "&SearchValue=" + SearchValue,
+                contentType: "html",
+                success: function (result) {
+                    if (result.length == 0) {
+                        SetData.append('<tr style="color:red"><td colspan="4">@Resource.NoMatchData</td></tr>')
+                    }
+                    else {
+                        $.each(result, function (index, value) {
+                            var Data = "<tr>" +
+                                "<td>" + value.fullName + "</td>" +
+                                "<td>" + value.phoneNumber + "</td>" +
+                                "<td>" + value.address + "</td>" +
+                                "<td> <a class='btn btn-warning' href='@Url.Action("EditContact", "Contact", new { id = String.Empty})/"+value.id+"'>@Resource.Edit</a>&nbsp" +
+                                "<a class='btn btn-primary' href='@Url.Action("DetailContact", "Contact", new { id = String.Empty})/"+value.id+"'>@Resource.Details</a>&nbsp"+
+                                "<a class='btn btn-danger' href='@Url.Action("DelContact", "Contact", new { id = String.Empty})/"+value.id+"'>@Resource.Delete</a>&nbsp</td>"+
+                                "</tr>";
+                            SetData.append(Data);
+
+                        });
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<!-- Modal -->
+<div class="modal fade" id="modelView" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">@Resource.DetailPerson</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">@Resource.Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        // a tagimizde bulunan .view classımıza click olduğunda
+        $("body").on("click", ".view", function () {
+            //data-target dan url mizi al
+            var url = $(this).data("target");
+            //bu urlimizi post et
+            $.post(url, function (data) { })
+                //eğer işlemimiz başarılı bir şekilde gerçekleşirse
+                .done(function (data) {
+                    //gelen datayı .modal-body mizin içerise html olarak ekle
+                    $("#modelView .modal-body").html(data);
+                    //sonra da modalimizi göster
+                    $("#modelView").modal("show");
+                })
+                //eğer işlem başarısız olursa
+                .fail(function () {
+                    //modalımızın bodysine Error! yaz
+                    $("#modelView .modal-body").text("Error!!");
+                    //sonra da modalimizi göster
+                    $("#modelView").modal("show");
+                })
+        });
+    });
+</script>
+
+

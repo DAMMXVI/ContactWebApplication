@@ -1,0 +1,32 @@
+﻿@model ContactWebApplication.Models.Contact
+
+
+<table>
+    <tr>
+        <td><b>@Html.DisplayNameFor(m => m.fullName)</b></td>
+        <td>&nbsp; : &nbsp; @Html.DisplayFor(m => m.fullName)</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(m => m.phoneNumber)</b></td>
+        <td>&nbsp; : &nbsp; @Model.phoneNumber</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(m => m.address)</b></td>
+        <td>&nbsp; : &nbsp; @Model.address</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(m => m.note)</b></td>
+        <td>&nbsp; : &nbsp; @Model.note</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(m => m.dateAdded)</b></td>
+        <td>&nbsp; : &nbsp; @Model.dateAdded</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(m => m.dateEdited)</b></td>
+        <td>&nbsp; : &nbsp; @Model.dateEdited</td>
+    </tr>
+
+</table>
+
+
